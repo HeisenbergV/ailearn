@@ -1,0 +1,74 @@
+name: metasploit
+version: "6.3.0"
+description: "Penetration testing framework for exploiting vulnerabilities."
+image: "metasploit-framework:latest"
+
+# 适用资产
+applicable_assets:
+  - type: "ip"
+    required: true
+  - type: "ports"
+    required: true
+
+# 输入参数
+parameters:
+  - name: "rhost"
+    type: "string"
+    description: "The IP address of the remote host to exploit."
+    source: "tool_output"  # 从其他工具输出中获取
+    required: true
+  - name: "rport"
+    type: "integer"
+    description: "The port number on the remote host to target for exploitation."
+    source: "tool_output"  # 从其他工具输出中获取
+    required: true
+  - name: "module"
+    type: "string"
+    description: "The Metasploit module to use for the exploit (e.g., exploit/windows/http/iis_vuln)."
+    source: "ai_deduction"  # AI 根据上下文推导
+    required: true
+
+# 执行命令
+command_template: "msfconsole -q -x 'use {module}; set RHOST {rhost}; set RPORT {rport}; exploit -j; exit'"
+
+# 输出描述
+output:
+  format: "text"
+  normalization:
+    type: "json"
+    schema:
+      - name: "ip"
+        type: "string"
+        description: "The IP address of the exploited target."
+      - name: "port"
+        type: "integer"
+        description: "The port number that was exploited."
+      - name: "session_id"
+        type: "string"
+        description: "The identifier of the session created if the exploit succeeds."
+      - name: "credentials"
+        type: "array"
+        description: "Authentication credentials captured from the target."
+        items:
+          - name: "username"
+            type: "string"
+            description: "The username part of the captured credentials."
+          - name: "password"
+            type: "string"
+            description: "The password part of the captured credentials."
+
+# 示例输出
+example_output:
+  raw: |
+    [*] Exploit completed, session opened
+    [*] Session 1 created
+    [*] Credential harvested: admin:password123
+  normalized:
+    {
+      "ip": "192.168.1.1",
+      "port": 80,
+      "session_id": "1",
+      "credentials": [
+        {"username": "admin", "password": "password123"}
+      ]
+    }

@@ -1,0 +1,50 @@
+name: whatweb
+version: "0.5.5"
+description: "Tool to identify web technologies on a target."
+image: "whatweb:latest"
+
+# 适用资产
+applicable_assets:
+  - type: "ip"
+    required: true
+
+# 输入参数
+parameters:
+  - name: "target"
+    type: "string"
+    description: "The IP address or domain of the target web server."
+    source: "tool_output"  # 从其他工具输出中获取
+    required: true
+
+# 执行命令
+command_template: "whatweb {target} -o {output_file}"
+
+# 输出描述
+output:
+  format: "text"
+  normalization:
+    type: "json"
+    schema:
+      - name: "ip"
+        type: "string"
+        description: "The IP address of the target web server."
+      - name: "technologies"
+        type: "array"
+        description: "A list of web technologies identified on the target."
+        items:
+          - name: "name"
+            type: "string"
+            description: "The name of a web technology (e.g., Apache, PHP)."
+
+# 示例输出
+example_output:
+  raw: |
+    192.168.1.1 [200 OK] Apache[2.4.41], PHP[7.4.3]
+  normalized:
+    {
+      "ip": "192.168.1.1",
+      "technologies": [
+        {"name": "Apache"},
+        {"name": "PHP"}
+      ]
+    }

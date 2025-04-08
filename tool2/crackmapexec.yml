@@ -1,0 +1,66 @@
+name: crackmapexec
+version: "5.4.0"
+description: "Tool for testing network credentials and permissions."
+image: "crackmapexec:latest"
+
+# 适用资产
+applicable_assets:
+  - type: "ip"
+    required: true
+
+# 输入参数
+parameters:
+  - name: "target"
+    type: "string"
+    description: "The IP address of the target network host."
+    source: "tool_output"  # 从其他工具输出中获取
+    required: true
+  - name: "username"
+    type: "string"
+    description: "The username for authenticating to the target network."
+    source: "tool_output"  # 从其他工具输出中获取
+    default: "admin"
+    required: false
+  - name: "password"
+    type: "string"
+    description: "The password for authenticating to the target network."
+    source: "tool_output"  # 从其他工具输出中获取
+    default: "password"
+    required: false
+
+# 执行命令
+command_template: "crackmapexec smb {target} -u {username} -p {password} --shares"
+
+# 输出描述
+output:
+  format: "text"
+  normalization:
+    type: "json"
+    schema:
+      - name: "ip"
+        type: "string"
+        description: "The IP address of the target network host."
+      - name: "shares"
+        type: "array"
+        description: "A list of accessible network shares on the target."
+        items:
+          - name: "name"
+            type: "string"
+            description: "The name of the network share."
+          - name: "access"
+            type: "string"
+            description: "The access level to the share (e.g., READ, WRITE)."
+
+# 示例输出
+example_output:
+  raw: |
+    SMB         192.168.1.1     445    SHARE1       READ
+    SMB         192.168.1.1     445    SHARE2       WRITE
+  normalized:
+    {
+      "ip": "192.168.1.1",
+      "shares": [
+        {"name": "SHARE1", "access": "READ"},
+        {"name": "SHARE2", "access": "WRITE"}
+      ]
+    }

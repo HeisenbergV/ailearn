@@ -1,0 +1,165 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "安全工具 API",
+      "description": "提供 Nikto、Nmap 和 SQLMap 的安全扫描功能",
+      "version": "v1.0.0"
+    },
+    "servers": [
+      {
+        "url": "http://192.168.5.6:8080"
+      }
+    ],
+    "paths": {
+      "/api/nikto": {
+        "get": {
+          "description": "执行 Nikto 安全扫描",
+          "operationId": "nikto",
+          "parameters": [
+            {
+              "name": "target",
+              "in": "query",
+              "description": "目标 URL 或 IP 地址",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "扫描结果",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "参数错误",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/nmap": {
+        "get": {
+          "description": "执行 Nmap 网络扫描",
+          "operationId": "nmap",
+          "parameters": [
+            {
+              "name": "target",
+              "in": "query",
+              "description": "目标 IP 地址或网段",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "扫描结果",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "参数错误",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/sqlmap": {
+        "get": {
+          "description": "执行 SQLMap SQL 注入扫描",
+          "operationId": "sqlmap",
+          "parameters": [
+            {
+              "name": "target",
+              "in": "query",
+              "description": "目标 URL",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "扫描结果",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "参数错误",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {}
+    }
+  }

@@ -1,0 +1,87 @@
+name: nmap
+version: "7.94"
+description: "Network scanning tool to discover hosts, ports, and services."
+image: "nmap:latest"
+
+# 适用资产
+applicable_assets:
+  - type: "ip"
+    required: true
+  - type: "domain"
+    required: false
+
+# 输入参数
+parameters:
+  - name: "target"
+    type: "string"
+    description: "The IP address or domain name of the target to scan."
+    source: "asset"  # 从用户输入的资产获取
+    required: true
+  - name: "scan_type"
+    type: "enum"
+    description: "The type of scan to perform (e.g., TCP or UDP)."
+    options:
+      - "T"  # TCP SYN scan
+      - "U"  # UDP scan
+    default: "T"
+    required: false
+  - name: "ports"
+    type: "string"
+    description: "The range of ports to scan (e.g., '80,443' or '1-1000')."
+    source: "asset"
+    default: "1-65535"
+    required: false
+
+# 执行命令
+command_template: "nmap -s{scan_type} -p {ports} --script vulners -oX {output_file} {target}"
+
+# 输出描述
+output:
+  format: "xml"
+  normalization:
+    type: "json"
+    schema:
+      - name: "ip"
+        type: "string"
+        description: "The IP address of the scanned target."
+      - name: "ports"
+        type: "array"
+        description: "A list of open ports and their associated details."
+        items:
+          - name: "port"
+            type: "integer"
+            description: "The port number identified as open."
+          - name: "state"
+            type: "string"
+            description: "The state of the port (e.g., open, closed)."
+          - name: "service"
+            type: "string"
+            description: "The service running on the port (e.g., http, ssh)."
+          - name: "vulnerabilities"
+            type: "array"
+            description: "Potential vulnerabilities detected on the port."
+            items:
+              - name: "cve"
+                type: "string"
+                description: "CVE identifier of a vulnerability."
+
+# 示例输出
+example_output:
+  raw: |
+    <nmaprun>
+      <host>
+        <address addr="192.168.1.1"/>
+        <ports>
+          <port portid="80"><state state="open"/><service name="http"/></port>
+          <port portid="443"><state state="open"/><service name="https"/></port>
+        </ports>
+      </host>
+    </nmaprun>
+  normalized:
+    {
+      "ip": "192.168.1.1",
+      "ports": [
+        {"port": 80, "state": "open", "service": "http", "vulnerabilities": []},
+        {"port": 443, "state": "open", "service": "https", "vulnerabilities": []}
+      ]
+    }
