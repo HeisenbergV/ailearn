@@ -1,0 +1,106 @@
+{
+    "tool": {
+      "id": "report_generator",
+      "name": "Report Generator",
+      "description": "Generates comprehensive security reports from tool outputs."
+    },
+    "capabilities": [
+      {
+        "id": "generate_report",
+        "name": "Report Generation",
+        "description": "Compiles tool outputs into a structured security report.",
+        "applicable_scenarios": ["Reporting"],
+        "asset_types": ["IP", "Port", "Vulnerability", "Credentials"],
+        "execution_context": "reporting",
+        "input_schema": {
+          "scan_results": {
+            "type": "array",
+            "required": false,
+            "description": "Port scan results.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "port": {"type": "integer"},
+                "service": {"type": "string"}
+              }
+            },
+            "annotations": {
+              "purpose": "Include port and service information in the report.",
+              "example": "[{\"port\": 22, \"service\": \"ssh\"}]",
+              "data_source": "Port scan results (e.g., Nmap.ports_services)."
+            }
+          },
+          "vuln_results": {
+            "type": "array",
+            "required": false,
+            "description": "Vulnerability scan results.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {"type": "string"},
+                "port": {"type": "integer"},
+                "severity": {"type": "string"}
+              }
+            },
+            "annotations": {
+              "purpose": "Include vulnerabilities in the report.",
+              "example": "[{\"id\": \"CVE-2017-0144\", \"port\": 445, \"severity\": \"High\"}]",
+              "data_source": "Vulnerability scan results (e.g., OpenVAS.vulnerabilities)."
+            }
+          },
+          "exploit_results": {
+            "type": "object",
+            "required": false,
+            "description": "Exploitation results.",
+            "annotations": {
+              "purpose": "Include exploitation outcomes in the report.",
+              "example": "{\"session\": true, \"details\": {\"session_id\": 1}}",
+              "data_source": "Exploitation results (e.g., Metasploit.details)."
+            }
+          },
+          "credential_results": {
+            "type": "array",
+            "required": false,
+            "description": "Cracked credentials.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "username": {"type": "string"},
+                "password": {"type": "string"}
+              }
+            },
+            "annotations": {
+              "purpose": "Include cracked credentials in the report.",
+              "example": "[{\"username\": \"admin\", \"password\": \"password123\"}]",
+              "data_source": "Brute force results (e.g., Hydra.credentials)."
+            }
+          }
+        },
+        "execution": {
+          "type": "command_line",
+          "command_template": "report_generator --input {scan_results} {vuln_results} {exploit_results} {credential_results} --output report.pdf"
+        },
+        "output_schema": {
+          "report": {
+            "type": "object",
+            "description": "Generated security report.",
+            "properties": {
+              "file_path": {"type": "string", "description": "Path to the generated report file."},
+              "summary": {"type": "string", "description": "Summary of findings."}
+            },
+            "annotations": {
+              "purpose": "Provides a comprehensive security report for user review.",
+              "example": "{\"file_path\": \"report.pdf\", \"summary\": \"Vulnerabilities found on 192.168.1.1.\"}"
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "Execution status of report generation.",
+            "annotations": {
+              "example": "success"
+            }
+          }
+        }
+      }
+    ]
+  }

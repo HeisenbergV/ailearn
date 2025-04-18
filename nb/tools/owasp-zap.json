@@ -1,0 +1,60 @@
+{
+    "tool": {
+      "id": "owasp_zap",
+      "name": "OWASP ZAP",
+      "description": "Web application security scanner for finding vulnerabilities."
+    },
+    "capabilities": [
+      {
+        "id": "web_app_scan",
+        "name": "Web Application Scanning",
+        "description": "Scans web applications for vulnerabilities.",
+        "applicable_scenarios": ["Web application testing"],
+        "asset_types": ["URL", "Service"],
+        "execution_context": "vulnerability_assessment",
+        "input_schema": {
+          "url": {
+            "type": "string",
+            "required": true,
+            "description": "Target web application URL.",
+            "annotations": {
+              "purpose": "Specify the web application to scan.",
+              "example": "http://192.168.1.1",
+              "data_source": "User input or web server scan results (e.g., Nikto)."
+            },
+            "constraints": {
+              "pattern": "^https?://.*"
+            }
+          }
+        },
+        "execution": {
+          "type": "command_line",
+          "command_template": "zap -t {url} -J zap_report.json"
+        },
+        "output_schema": {
+          "vulnerabilities": {
+            "type": "array",
+            "description": "List of detected web application vulnerabilities.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {"type": "string", "description": "Vulnerability ID."},
+                "description": {"type": "string", "description": "Details of the vulnerability."}
+              }
+            },
+            "annotations": {
+              "purpose": "Provides web app vulnerabilities for reporting.",
+              "example": "[{\"id\": \"ZAP-001\", \"description\": \"XSS vulnerability found.\"}]"
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "Execution status of the scan.",
+            "annotations": {
+              "example": "success"
+            }
+          }
+        }
+      }
+    ]
+  }
